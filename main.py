@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import requests
 from src.utils import room_num_to_id
 from src.mongo import *
+import os
 
 app = Flask(__name__)
 URL = "https://spider.eng.auburn.edu/makerspace/ajax-multi.php"
@@ -45,7 +46,7 @@ def reserve():
 @app.route('/delete', methods=['POST'])
 def delete():
     room_num = room_num_to_id(request.form['room'])
-    appt_id = request.form['appt_id']
+    appt_id = int(request.form['appt_id'])
     post_data = {
         "object": room_num,
         "appt_id": appt_id,
@@ -60,4 +61,4 @@ def delete():
         return {'error': res['errorMsg']}
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0", port=os.environ.get("PORT", 8080))
