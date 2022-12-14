@@ -1,9 +1,10 @@
 FROM python:3.10-slim
 ENV PYTHONUNBUFFERED True
+ENV PORT 8080
 
 WORKDIR /app
 COPY . ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "main.py"]
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app
