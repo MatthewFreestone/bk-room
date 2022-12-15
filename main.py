@@ -1,22 +1,22 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file
 import requests
 from src.utils import room_num_to_id
 from src.mongo import *
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='frontend/build/static', template_folder='templates')
 URL = "https://spider.eng.auburn.edu/makerspace/ajax-multi.php"
 
 @app.route('/')
 def index():
     return render_template('index.html', reservations=get_all_entries())
 
-@app.route('/test_endpoint', methods=['POST'])
-def test_endpoint():
-    return dict(request.form)
+@app.route('/react')
+def react():
+    return send_file('frontend/build/index.html')
 
 @app.route('/reserve', methods=['POST'])
 def reserve():
