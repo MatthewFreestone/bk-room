@@ -6,7 +6,10 @@ import requests
 from src.utils import room_num_to_id
 from src.mongo import *
 
-app = Flask(__name__, static_folder='../frontend/build/static', template_folder='templates')
+STATIC_FOLDER = os.environ.get('STATIC_FOLDER', '../frontend/build/static')
+REACT_INDEX = os.environ.get('REACT_INDEX', '../frontend/build/index.html')
+
+app = Flask(__name__, static_folder=STATIC_FOLDER)
 URL = "https://spider.eng.auburn.edu/makerspace/ajax-multi.php"
 
 @app.route('/')
@@ -15,7 +18,7 @@ def index():
 
 @app.route('/react')
 def react():
-    return send_file('../frontend/build/index.html')
+    return send_file(REACT_INDEX)
 
 @app.route('/reserve', methods=['POST'])
 def reserve():

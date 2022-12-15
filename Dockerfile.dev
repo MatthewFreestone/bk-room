@@ -11,9 +11,12 @@ FROM python:3.10-slim as run-stage
 ENV PYTHONUNBUFFERED True
 WORKDIR /app
 
-COPY ./requirements.txt ./
+COPY ./backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . ./
+COPY ./.env ./
+COPY ./backend .
 COPY --from=build-stage /app/build ./frontend/build
+ENV STATIC_FOLDER frontend/build/static
+ENV REACT_INDEX frontend/build/index.html
 
 CMD ["python", "main.py"]
