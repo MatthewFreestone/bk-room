@@ -1,6 +1,11 @@
-__pycache__/
+/__pycache__/
 *.pyc
 *.pyo
 *.pyd
+/venv/
 README.md
-.env
+# .env
+
+# Frontend files
+/node_modules/
+/build/

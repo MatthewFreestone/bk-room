@@ -1,3 +1,19 @@
+## Backend
 venv/
 __pycache__/
+
+## Frontend
+# dependencies
+/frontend/node_modules/
+/.pnp
+.pnp.js
+
+# testing
+frontend/coverage
+
+# production
+frontend/build/
+
+
+## General
 .env

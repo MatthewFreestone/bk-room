@@ -4,6 +4,9 @@ import os
 
 mongo_url = os.getenv("MONGO_URL")
 
+if mongo_url is None:
+    raise Exception("MONGO_URL not set")
+
 client = MongoClient(mongo_url, server_api=ServerApi('1'))
 env = os.getenv("MONGO_ENV")
 db = client[env]
