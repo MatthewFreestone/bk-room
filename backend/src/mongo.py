@@ -1,5 +1,7 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from .utils import date_to_str
+from datetime import datetime
 import os
 
 mongo_url = os.getenv("MONGO_URL")
@@ -17,8 +19,12 @@ def write_to_db(data):
 def delete_from_db(appt_id: str):
     db.appt.delete_one({"appt_id": appt_id})
 
-def get_all_entries():
-    return db.appt.find()
+def get_all_entries(past=False):
+    if past:
+        return db.appt.find()
+    else:
+        curr_date = date_to_str(datetime.now())
+        return db.appt.find({"Date": {"$gte": curr_date}})
 
 # read all entries
 def main():

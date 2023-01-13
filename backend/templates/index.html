@@ -9,7 +9,7 @@
 </head>
 <body class="container">
     <h1 class="text-center" class="mt-5">Room Reserver</h1>
-    <form action="/reserve" method="POST" class="mb-5">
+    <form action="/api/reserve" method="POST" class="mb-5">
         <div class="form-group">
             <label for="username">Username</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Enter username (aaa0000)">
@@ -36,7 +36,7 @@
     <div class="row my-5">
         <div class="col">
             <h2 class="text-center">Delete Reservation</h2>
-            <form action="/delete" method="POST">
+            <form action="/api/delete" method="POST">
                 <div class="form-group">
                     <label for="username">Appt ID</label>
                     <input type="text" class="form-control" id="appt_id" name="appt_id" placeholder="Enter Appt_id (00000)">

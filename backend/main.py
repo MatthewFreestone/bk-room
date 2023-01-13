@@ -14,13 +14,13 @@ URL = "https://spider.eng.auburn.edu/makerspace/ajax-multi.php"
 
 @app.route('/')
 def index():
-    return render_template('index.html', reservations=get_all_entries())
+    return render_template('index.html', reservations=get_all_entries(past=False))
 
 @app.route('/react')
 def react():
     return send_file(REACT_INDEX)
 
-@app.route('/reserve', methods=['POST'])
+@app.route('/api/reserve', methods=['POST'])
 def reserve():
     room_num = request.form['room']
     object_num = room_num_to_id(room_num)
@@ -45,7 +45,7 @@ def reserve():
     else:
         return {'error': res['errorMsg']}
 
-@app.route('/delete', methods=['POST'])
+@app.route('/api/delete', methods=['POST'])
 def delete():
     room_num = room_num_to_id(request.form['room'])
     appt_id = int(request.form['appt_id'])
