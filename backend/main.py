@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask_cors import CORS
 import requests
 from src.utils import room_num_to_id
 from src.mongo import *
@@ -10,6 +11,7 @@ STATIC_FOLDER = os.environ.get('STATIC_FOLDER', '../frontend/build/static')
 REACT_INDEX = os.environ.get('REACT_INDEX', '../frontend/build/index.html')
 
 app = Flask(__name__, static_folder=STATIC_FOLDER)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 URL = "https://spider.eng.auburn.edu/makerspace/ajax-multi.php"
 
 @app.route('/')
@@ -19,6 +21,20 @@ def index():
 @app.route('/react')
 def react():
     return send_file(REACT_INDEX)
+
+@app.route('/api/get-reservations', methods=['GET'])
+def get_reservations():
+    past = request.args.get('past', default=False, type=bool)
+    reservations = get_all_entries(past=past)
+    if reservations:
+        res = list(reservations)
+        for r in res:
+            r.pop('_id')
+        res = sorted(res, key=lambda x: x['appt_id'], reverse=True)
+    else:
+        res = {[]}
+    # print(res)
+    return res
 
 @app.route('/api/reserve', methods=['POST'])
 def reserve():
