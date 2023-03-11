@@ -15,7 +15,7 @@ ENV PORT 8080
 WORKDIR /app
 
 COPY ./backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 # COPY ./.env ./
 COPY ./backend .
 COPY --from=build-stage /app/build ./frontend/build
