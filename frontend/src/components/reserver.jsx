@@ -1,15 +1,42 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
-const Reserver = () => {
+const Reserver = ({ backend_url }) => {
+  const usernameRegex = useMemo(() => /^[a-z]{3}[0-9]{4}$/i, []);
+  const [submitEnabled, setSubmitEnabled] = useState(false);
   const [username, setUsername] = useState("");
-  const backend_url = process.env.REACT_APP_BACKEND;
+  const room = useRef();
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const supportedRooms = [
+    "2116",
+    "2118",
+    "2120",
+    "2125",
+    "2127",
+    "2130",
+    "2128",
+    "2132",
+    "2135",
+    "2137",
+    "2145",
+    "2147",
+    "2153",
+    "2159",
+    "2161",
+    "2162",
+    "2164",
+    "2166",
+    "2168",
+    "2170",
+    "2174",
+    "2143",
+    "2151",
+    "2157",
+  ];
+
   const onSubmit = (e) => {
     e.preventDefault();
-    const username = e.target.username.value;
-    const room = e.target.room.value;
-    const start = e.target.start.value;
-    const end = e.target.end.value;
-    const date = e.target.date.value;
     localStorage.setItem("username", username);
     setUsername(username);
     fetch(`${backend_url}/api/reserve`, {
@@ -19,9 +46,9 @@ const Reserver = () => {
       },
       body: JSON.stringify({
         username,
-        room,
-        start,
-        end,
+        room: room.current.value,
+        start: startTime,
+        end: endTime,
         date,
       }),
     })
@@ -31,65 +58,96 @@ const Reserver = () => {
       });
   };
 
-  const onChangeUsername = (e) => {
-    setUsername(e.target.value);
-  };
+  useEffect(() => {
+    if (usernameRegex.test(username) && date && endTime > startTime) {
+      setSubmitEnabled(true);
+    } else {
+      setSubmitEnabled(false);
+    }
+  }, [usernameRegex, username, date, startTime, endTime]);
 
   return (
-    <form className="mb-5">
+    <form className="mb-5" noValidate={true}>
       <div className="form-group">
         <label htmlFor="username">Username</label>
         <input
           type="text"
-          className="form-control"
+          className={
+            `form-control ${(username && ! usernameRegex.test(username)) ? "is-invalid" : ""}`
+          }
           id="username"
           name="username"
           placeholder="Enter username (aaa0000)"
           value={username}
-          onChange={onChangeUsername}
+          onChange={(e) => setUsername(e.target.value)}
+          required
         />
       </div>
       <div className="form-group">
         <label htmlFor="room">Room Number</label>
-        <input
-          type="text"
-          className="form-control"
-          id="room"
-          name="room"
-          placeholder="Enter room number (2127)"
-        />
+        <select 
+        className="form-control" 
+        ref={room}
+        id="room" 
+        name="room" 
+        required>
+          {supportedRooms.map((room) => (
+            <option key={room} value={room}>
+              {room}
+            </option>
+          ))}
+        </select>
       </div>
-      <div className="form-group">
-        <label htmlFor="start">Start Time</label>
-        <input
-          type="text"
-          className="form-control"
-          id="start"
-          name="start"
-          placeholder="Enter start time (13:00)"
-        />
+      <div className="form-row">
+        <div className="form-group col-md-4">
+          <label htmlFor="date">Date</label>
+          <input
+            className="form-control"
+            type="date"
+            id="date"
+            name="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            min={new Date().toISOString().split("T")[0]}
+            required
+          />
+        </div>
+        <div className="form-group col-md-4">
+          <label htmlFor="start">Start Time</label>
+          <input
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            className="form-control"
+            id="start"
+            name="start"
+            required
+          />
+        </div>
+        <div className="form-group col-md-4">
+          <label htmlFor="end">End Time</label>
+          <input
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            className={
+              `form-control ${(startTime &&
+                endTime &&
+                startTime >= endTime) ? "is-invalid" : ""}`
+            }
+            id="end"
+            name="end"
+            required
+          />
+        </div>
       </div>
-      <div className="form-group">
-        <label htmlFor="end">End Time</label>
-        <input
-          type="text"
-          className="form-control"
-          id="end"
-          name="end"
-          placeholder="Enter end time (14:00)"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="date">Date</label>
-        <input
-          type="text"
-          className="form-control"
-          id="date"
-          name="date"
-          placeholder="Enter date (2022-12-25)"
-        />
-      </div>
-      <button type="submit" className="btn btn-primary" onClick={onSubmit}>
+
+      <button
+        type="submit"
+        className="btn btn-primary"
+        onClick={onSubmit}
+        disabled={!submitEnabled}
+      >
         Reserve
       </button>
     </form>

@@ -38,12 +38,13 @@ def get_reservations():
 
 @app.route('/api/reserve', methods=['POST'])
 def reserve():
-    room_num = request.form['room']
+    data = request.get_json()
+    room_num = data['room']
     object_num = room_num_to_id(room_num)
-    username = request.form['username']
-    start_time = request.form['start']
-    end_time = request.form['end']
-    date = request.form['date']
+    username = data['username']
+    start_time = data['start']
+    end_time = data['end']
+    date = data['date']
     post_data = {
         "object": object_num,
         "username": username,
@@ -63,6 +64,8 @@ def reserve():
 
 @app.route('/api/delete', methods=['POST'])
 def delete():
+    if not (request.form['room'] and request.form['appt_id']):
+        return {'error': 'Missing room or appt_id'}
     room_num = room_num_to_id(request.form['room'])
     appt_id = int(request.form['appt_id'])
     post_data = {
