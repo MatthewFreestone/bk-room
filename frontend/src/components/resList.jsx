@@ -16,7 +16,7 @@ const ReservationList = ({backend_url}) => {
   }, [backend_url]);
 
   const deleteReservation = (appt_id, room) => {
-    fetch(`${backend_url}/api/delete-reservation`, {
+    fetch(`${backend_url}/api/delete`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

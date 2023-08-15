@@ -14,12 +14,12 @@ app = Flask(__name__, static_folder=STATIC_FOLDER)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 URL = "https://spider.eng.auburn.edu/makerspace/ajax-multi.php"
 
+# @app.route('/')
+# def index():
+#     return render_template('index.html', reservations=get_all_entries(past=False))
+
 @app.route('/')
 def index():
-    return render_template('index.html', reservations=get_all_entries(past=False))
-
-@app.route('/react')
-def react():
     return send_file(REACT_INDEX)
 
 @app.route('/api/get-reservations', methods=['GET'])
@@ -64,12 +64,14 @@ def reserve():
 
 @app.route('/api/delete', methods=['POST'])
 def delete():
-    if not (request.form['room'] and request.form['appt_id']):
+    data = request.get_json()
+    if ('room' not in data or 'appt_id' not in data):
         return {'error': 'Missing room or appt_id'}
-    room_num = room_num_to_id(request.form['room'])
-    appt_id = int(request.form['appt_id'])
+    room_num = data['room']
+    object_num = room_num_to_id(room_num)
+    appt_id = int(data['appt_id'])
     post_data = {
-        "object": room_num,
+        "object": object_num,
         "appt_id": appt_id,
         "delete": 1
     }

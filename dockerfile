@@ -1,4 +1,4 @@
-FROM node:16.13.0-alpine3.14 as build-stage
+FROM node:16.13.0-alpine3.14 AS build-stage
 WORKDIR /app
 
 COPY ./frontend/package.json ./
@@ -7,7 +7,7 @@ COPY ./frontend .
 RUN npm run build
 
 
-FROM python:3.10-slim as run-stage
+FROM python:3.10-slim AS run-stage
 ENV PYTHONUNBUFFERED True
 ENV MONGO_ENV prod
 ENV PORT 8080
