@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 
-const Reserver = ({ backend_url }) => {
-  const usernameRegex = useMemo(() => /^[a-z]{3}[0-9]{4}$/i, []);
+const Reserver = ({ backend_url, refreshReservations }) => {
+  const usernameRegex = useMemo(() => /^[a-z]{3}\d{4}$/i, []);
   const [submitEnabled, setSubmitEnabled] = useState(false);
   const [username, setUsername] = useState("");
   const room = useRef();
@@ -37,8 +37,7 @@ const Reserver = ({ backend_url }) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    localStorage.setItem("username", username);
-    setUsername(username);
+    localStorage.setItem("au_username", username);
     fetch(`${backend_url}/api/reserve`, {
       method: "POST",
       headers: {
@@ -52,11 +51,23 @@ const Reserver = ({ backend_url }) => {
         date,
       }),
     })
+      .catch((err) => console.error(err))
       .then((res) => res.json())
       .then((res) => {
+        if (res.error) {
+          alert("Error reserving room: " + res.error);
+          return;
+        }
         console.log(res);
-      });
+        refreshReservations();
+      })
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("au_username")) {
+      setUsername(localStorage.getItem("au_username"));
+    }
+  }, []);
 
   useEffect(() => {
     if (usernameRegex.test(username) && date && endTime > startTime) {

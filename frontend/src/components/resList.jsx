@@ -1,19 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useEffect } from "react";
 
-const ReservationList = ({backend_url}) => {
-  const [reservations, setReservations] = useState();
-
-  const refreshReservations = useCallback(() => {
-    fetch(`${backend_url}/api/get-reservations?past=True`)
-      .then((res) => res.json())
-      .then((res) => {
-        setReservations(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      }
-    );
-  }, [backend_url]);
+const ReservationList = ({backend_url, reservations, refreshReservations}) => {
 
   const deleteReservation = (appt_id, room) => {
     fetch(`${backend_url}/api/delete`, {
@@ -27,11 +14,23 @@ const ReservationList = ({backend_url}) => {
       }),
     })
       .then((res) => res.json())
+      .catch((err) => console.error(err))
       .then((res) => {
+        if (res.error) {
+          alert("Error deleting reservation: " + res.error);
+          return;
+        }
         console.log(res);
         refreshReservations();
       });
   };
+
+  const milTimeToStandard = (milTime) => {
+    let time = milTime.split(":")
+    const pm = time[0] >= 12
+    time[0] = (pm && time[0] !== '12') ? time[0] - 12 : time[0]
+    return time.join(':') + (pm ? ' PM' : ' AM')
+  }
 
   useEffect(() => {
     refreshReservations();
@@ -52,22 +51,17 @@ const ReservationList = ({backend_url}) => {
           </tr>
         </thead>
         <tbody>
-          {reservations &&
-            reservations.map((reservation) => {
-              return (
-                <tr key={reservation.appt_id}>
-                  <th scope="row">{reservation.appt_id}</th>
-                  <td>{reservation.username}</td>
-                  <td>{reservation.room}</td>
-                  <td>{reservation.StartTime}</td>
-                  <td>{reservation.EndTime}</td>
-                  <td>{reservation.Date}</td>
-                  <td><button className="btn btn-danger" onClick={
-                    () => deleteReservation(reservation.appt_id, reservation.room)
-                  }>Delete</button></td>
-                </tr>
-              );
-            })}
+          {reservations?.map((reservation) => (
+            <tr key={reservation.appt_id}>
+              <th scope="row">{reservation.appt_id}</th>
+              <td>{reservation.username}</td>
+              <td>{reservation.room}</td>
+              <td>{milTimeToStandard(reservation.StartTime)}</td>
+              <td>{milTimeToStandard(reservation.EndTime)}</td>
+              <td>{reservation.Date}</td>
+              <td><button className="btn btn-danger" onClick={() => deleteReservation(reservation.appt_id, reservation.room)}>Delete</button></td>
+            </tr>
+          ))}
           {!reservations && (
             <tr>
               <td colSpan="7">Loading...</td>

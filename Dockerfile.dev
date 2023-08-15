@@ -9,14 +9,14 @@ RUN npm run build
 
 FROM python:3.10-slim AS run-stage
 ENV PYTHONUNBUFFERED True
+ENV PORT 8080
 WORKDIR /app
 
 COPY ./backend/requirements.txt ./
 RUN pip install -r requirements.txt
 COPY ./.env ./
 COPY ./backend .
-COPY --from=build-stage /app/build ./frontend/build
-ENV STATIC_FOLDER frontend/build/static
-ENV REACT_INDEX frontend/build/index.html
+COPY --from=build-stage /app/build /app/build
+ENV REACT_BUILD_DIR /app/build/
 
 CMD ["python", "main.py"]
