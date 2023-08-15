@@ -3,12 +3,13 @@ import { useState, useCallback} from "react";
 import Reserver from "./components/reserver";
 import ReservationList from "./components/resList";
 
-const backend_url = process.env.REACT_APP_BACKEND ?? "http://localhost:8080";
+const backend_url = process.env.REACT_APP_BACKEND ?? "";
 function App() {
   const [reservations, setReservations] = useState([]);
   
-  const refreshReservations = useCallback(() => {
-    fetch(`${backend_url}/api/get-reservations?past=True`)
+  const refreshReservations = useCallback((showpast=false) => {
+    const url = showpast ? `${backend_url}/api/get-reservations?past=True` : `${backend_url}/api/get-reservations`;
+    fetch(url)
       .then((res) => res.json())
       .then((res) => {
         setReservations(res);

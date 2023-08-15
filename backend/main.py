@@ -19,9 +19,6 @@ URL = "https://spider.eng.auburn.edu/makerspace/ajax-multi.php"
 @app.route('/')
 def index():
     return render_template('index.html')
-    # return send_from_directory(app.template_folder, 'index.html')
-    
-    # return send_file(REACT_INDEX)
 
 @app.route('/api/get-reservations', methods=['GET'])
 def get_reservations():
